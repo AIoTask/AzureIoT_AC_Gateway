@@ -11,24 +11,26 @@
       "$LED_GREEN",
       "$LED_BLUE"
     ],
+    "Uart": [ "ISU0", "ISU1" ],
     "I2cMaster": [
       "$I2cMaster2"
     ],
     "PowerControls": [
       "ForceReboot"
     ],
-    "AllowedConnections": [ 
-        "global.azure-devices-provisioning.net",
-        "iotc-fdd6a25f-fe91-4b34-aca1-652faefffde0.azure-devices.net",
-        "iotc-9411b37f-7eb1-4116-a3f5-33766f2ae942.azure-devices.net",
-        "iotc-da4e4c73-de2b-4205-932e-f767d15c68b5.azure-devices.net",
-        "iotc-32f84efb-5e10-465f-be7f-f5f5b415b1bf.azure-devices.net",
-        "iotc-ced2cc85-f56f-47f0-9005-aac2cda77b2b.azure-devices.net",
-        "iotc-fbdb8615-4868-42a4-8e65-9786e5e26f87.azure-devices.net",
-        "iotc-a1757114-8039-4c21-91bf-14de58ad50a4.azure-devices.net",
-        "iotc-b6d99f55-4650-4ce3-9883-ef06f9d8ad89.azure-devices.net",
-        "iotc-99abb14b-4171-4eb2-930e-545b716ff394.azure-devices.net",
-        "iotc-840e321f-71d7-4c5a-81c7-00a7fe009924.azure-devices.net" ],
+    "AllowedConnections": [
+      "global.azure-devices-provisioning.net",
+      "iotc-fdd6a25f-fe91-4b34-aca1-652faefffde0.azure-devices.net",
+      "iotc-9411b37f-7eb1-4116-a3f5-33766f2ae942.azure-devices.net",
+      "iotc-da4e4c73-de2b-4205-932e-f767d15c68b5.azure-devices.net",
+      "iotc-32f84efb-5e10-465f-be7f-f5f5b415b1bf.azure-devices.net",
+      "iotc-ced2cc85-f56f-47f0-9005-aac2cda77b2b.azure-devices.net",
+      "iotc-fbdb8615-4868-42a4-8e65-9786e5e26f87.azure-devices.net",
+      "iotc-a1757114-8039-4c21-91bf-14de58ad50a4.azure-devices.net",
+      "iotc-b6d99f55-4650-4ce3-9883-ef06f9d8ad89.azure-devices.net",
+      "iotc-99abb14b-4171-4eb2-930e-545b716ff394.azure-devices.net",
+      "iotc-840e321f-71d7-4c5a-81c7-00a7fe009924.azure-devices.net"
+    ],
     "DeviceAuthentication": "2aa50f74-c316-4064-b2f6-ccadf67917e2"
   },
   "ApplicationType": "Default"
