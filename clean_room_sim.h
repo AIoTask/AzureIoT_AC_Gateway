@@ -1,6 +1,8 @@
 #ifndef CLEAN_ROOM_SIM
 #define CLEAN_ROOM_SIM
 
+#include <applibs/log.h>
+
 typedef struct {
 	int temperature;	// Store Environment Temperature
 	int humidity;		// Store Humidity

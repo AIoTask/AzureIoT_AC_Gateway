@@ -1,8 +1,7 @@
 #include "clean_room_sim.h"
-#include <applibs/log.h>
 
 void cr_parameter_init(clean_room_env_param* crep) {
-	Log_Debug("Initialize clean room \n");
+	Log_Debug("Initialize clean room...\n");
 	crep->temperature = 0;
 	crep->humidity = 0;
 	crep->co2Density = 0;
