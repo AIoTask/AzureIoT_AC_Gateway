@@ -55,6 +55,9 @@
 #include <stdio.h>
 #include <time.h>
 
+// User-defined Library
+#include "clean_room_sim.h"
+
 // Hardware specific
 #ifdef OEM_AVNET
 #include "board.h"
@@ -148,13 +151,14 @@ static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer)
 		lp_terminate(ExitCode_ConsumeEventLoopTimeEvent);
 	}
 	else {
-		if (lp_readTelemetry(&environment) &&
+		/*if (lp_readTelemetry(&environment) &&
 			snprintf(msgBuffer, JSON_MESSAGE_BYTES, msgTemplate,
 				environment.temperature, environment.humidity, environment.pressure, environment.CO2, environment.light, environment.dB, msgId++) > 0)
 		{
 			Log_Debug("%s\n", msgBuffer);
 			lp_azureMsgSendWithProperties(msgBuffer, telemetryMessageProperties, NELEMS(telemetryMessageProperties));
-		}
+		}*/
+		Log_Debug("Send data...\n");
 	}
 }
 
@@ -164,12 +168,16 @@ static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer)
 /// </summary>
 static void InitPeripheralsAndHandlers(void)
 {
+	// Azure IoT initialize
 	lp_azureInitialize(lp_config.scopeId, IOT_PLUG_AND_PLAY_MODEL_ID);
 
+	// DevKit initialize
 	lp_initializeDevKit();
 
+	// Open the GPIO
 	lp_gpioSetOpen(peripheralGpioSet, NELEMS(peripheralGpioSet));
 
+	// Start timer
 	lp_timerSetStart(timerSet, NELEMS(timerSet));
 }
 
@@ -180,6 +188,7 @@ static void ClosePeripheralsAndHandlers(void)
 {
 	Log_Debug("Closing file descriptors\n");
 
+	// Stop timers and Azure IoT Service
 	lp_timerSetStop(timerSet, NELEMS(timerSet));
 	lp_azureToDeviceStop();
 
@@ -193,13 +202,17 @@ static void ClosePeripheralsAndHandlers(void)
 
 int main(int argc, char* argv[])
 {
+
+	// Register Linux signal SIGTERM
 	lp_registerTerminationHandler();
 
+	// Parse input command arguments and verify the correctness
 	lp_configParseCmdLineArguments(argc, argv, &lp_config);
 	if (!lp_configValidate(&lp_config)) {
 		return lp_getTerminationExitCode();
 	}
 
+	// Initialize user-defined Peripheral and Handlers
 	InitPeripheralsAndHandlers();
 
 	// Main loop
@@ -213,6 +226,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	// Close user-defined Peripheral and Handlers
 	ClosePeripheralsAndHandlers();
 
 	Log_Debug("Application exiting.\n");
