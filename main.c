@@ -57,6 +57,7 @@
 
 // User-defined Library
 #include "clean_room_sim.h"
+#include "http_operation.h"
 
 // Hardware specific
 #ifdef OEM_AVNET

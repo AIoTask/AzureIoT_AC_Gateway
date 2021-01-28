@@ -56,10 +56,10 @@ endif(SEEED_STUDIO_RDB OR SEEED_STUDIO_MINI)
 set(ALL_FILES
     ${Source}
     ${Oem}
- "clean_room_sim.c")
+ "clean_room_sim.c" "http_operation.c")
 
 # Create executable
-add_executable(${PROJECT_NAME} ${ALL_FILES} "clean_room_sim.c" "clean_room_sim.h")
+add_executable(${PROJECT_NAME} ${ALL_FILES} "clean_room_sim.c" "clean_room_sim.h" "http_operation.c")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC AZURE_IOT_HUB_CONFIGURED)
 target_link_libraries(${PROJECT_NAME} applibs pthread gcc_s c azsphere_libs )
