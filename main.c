@@ -216,8 +216,11 @@ int main(int argc, char* argv[])
 	// Initialize user-defined Peripheral and Handlers
 	InitPeripheralsAndHandlers();
 
+	// HTTPS Testing
+	http_get_env_data();
+
 	// Main loop
-	while (!lp_isTerminationRequired())
+	/*while (!lp_isTerminationRequired())
 	{
 		int result = EventLoop_Run(lp_timerGetEventLoop(), -1, true);
 		// Continue if interrupted by signal, e.g. due to breakpoint being set.
@@ -225,7 +228,7 @@ int main(int argc, char* argv[])
 		{
 			lp_terminate(ExitCode_Main_EventLoopFail);
 		}
-	}
+	}*/
 
 	// Close user-defined Peripheral and Handlers
 	ClosePeripheralsAndHandlers();
