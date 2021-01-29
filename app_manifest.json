@@ -11,7 +11,7 @@
       "$LED_GREEN",
       "$LED_BLUE"
     ],
-    "Uart": [ "ISU0", "ISU1" ],
+    "Uart": [ "$AVNET_MT3620_SK_ISU0_UART", "$AVNET_MT3620_SK_ISU1_UART" ],
     "I2cMaster": [
       "$I2cMaster2"
     ],
