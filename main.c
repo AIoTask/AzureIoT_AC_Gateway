@@ -57,6 +57,7 @@
 
 // User-defined Library
 #include "clean_room_sim.h"
+#include "uart_conn.h"
 
 // Hardware specific
 #ifdef OEM_AVNET
@@ -215,8 +216,12 @@ int main(int argc, char* argv[])
 	// Initialize user-defined Peripheral and Handlers
 	InitPeripheralsAndHandlers();
 
+	int res = uart_open(57600);
+	Log_Debug("%d\n", res);
+	if (res > 0) close(res);
+
 	// Main loop
-	while (!lp_isTerminationRequired())
+	/*while (!lp_isTerminationRequired())
 	{
 		int result = EventLoop_Run(lp_timerGetEventLoop(), -1, true);
 		// Continue if interrupted by signal, e.g. due to breakpoint being set.
@@ -224,7 +229,7 @@ int main(int argc, char* argv[])
 		{
 			lp_terminate(ExitCode_Main_EventLoopFail);
 		}
-	}
+	}*/
 
 	// Close user-defined Peripheral and Handlers
 	ClosePeripheralsAndHandlers();
