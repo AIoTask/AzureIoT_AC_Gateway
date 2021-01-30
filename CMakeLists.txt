@@ -59,7 +59,7 @@ set(ALL_FILES
  "clean_room_sim.c" "http_operation.c")
 
 # Create executable
-add_executable(${PROJECT_NAME} ${ALL_FILES} "clean_room_sim.c" "clean_room_sim.h" "http_operation.c")
+add_executable(${PROJECT_NAME} ${ALL_FILES} "clean_room_sim.c" "clean_room_sim.h" "uart_conn.c" "http_operation.c")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC AZURE_IOT_HUB_CONFIGURED)
 target_link_libraries(${PROJECT_NAME} applibs pthread gcc_s c azsphere_libs curl)

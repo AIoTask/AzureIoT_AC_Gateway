@@ -57,6 +57,7 @@
 
 // User-defined Library
 #include "clean_room_sim.h"
+#include "uart_conn.h"
 #include "http_operation.h"
 
 // Hardware specific
@@ -109,6 +110,7 @@ LP_TIMER* timerSet[] = { &azureIotConnectionStatusTimer, &measureSensorTimer };
 // Message templates and property sets
 
 static const char* msgTemplate = "{ \"Temperature\":%3.2f, \"Humidity\":%3.1f, \"Pressure\":%3.1f, \"CO2\":%d, \"Light\":%d, \"dB\":%d, \"MsgId\":%d }";
+static int uart_fd;
 
 static LP_MESSAGE_PROPERTY* telemetryMessageProperties[] = {
 	&(LP_MESSAGE_PROPERTY) { .key = "appid", .value = "hvac" },
@@ -163,7 +165,6 @@ static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer)
 	}
 }
 
-
 /// <summary>
 ///  Initialize peripherals, device twins, direct methods, timers.
 /// </summary>
@@ -180,6 +181,8 @@ static void InitPeripheralsAndHandlers(void)
 
 	// Start timer
 	lp_timerSetStart(timerSet, NELEMS(timerSet));
+
+    uart_fd = uart_open(57600);
 }
 
 /// <summary>
@@ -198,6 +201,8 @@ static void ClosePeripheralsAndHandlers(void)
 	lp_closeDevKit();
 
 	lp_timerEventLoopStop();
+
+	close(uart_fd);
 }
 
 
