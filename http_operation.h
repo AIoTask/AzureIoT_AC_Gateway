@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <applibs/log.h>
 
@@ -13,6 +14,6 @@
 
 int http_get_env_data();
 
-int http_get_ac_data();
+int http_transfer_ac_data(int);
 
 #endif

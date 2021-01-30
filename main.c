@@ -79,6 +79,7 @@
 // Forward signatures
 static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer);
 static void AzureIoTConnectionStatusHandler(EventLoopTimer* eventLoopTimer);
+static void get_simulation_data(EventLoopTimer* eventLoopTimer);
 
 LP_USER_CONFIG lp_config;
 
@@ -103,9 +104,15 @@ static LP_TIMER measureSensorTimer = {
 	.name = "measureSensorTimer",
 	.handler = MeasureSensorHandler };
 
+static LP_TIMER getSimulationData = {
+	.period = { 4, 0 },
+	.name = "getSimulationData",
+	.handler = get_simulation_data };
+
+
 // Initialize Sets
 LP_GPIO* peripheralGpioSet[] = { &azureIotConnectedLed };
-LP_TIMER* timerSet[] = { &azureIotConnectionStatusTimer, &measureSensorTimer };
+LP_TIMER* timerSet[] = { &measureSensorTimer, &getSimulationData };
 
 // Message templates and property sets
 
@@ -161,7 +168,27 @@ static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer)
 			Log_Debug("%s\n", msgBuffer);
 			lp_azureMsgSendWithProperties(msgBuffer, telemetryMessageProperties, NELEMS(telemetryMessageProperties));
 		}*/
-		Log_Debug("Send data...\n");
+		
+	}
+}
+
+/// <summary>
+/// Read sensor and send to Azure IoT
+/// </summary>
+static void get_simulation_data(EventLoopTimer* eventLoopTimer)
+{
+	static int msgId = 0;
+	static LP_ENVIRONMENT environment;
+
+	if (ConsumeEventLoopTimerEvent(eventLoopTimer) != 0)
+	{
+		lp_terminate(ExitCode_ConsumeEventLoopTimeEvent);
+	}
+	else {
+		Log_Debug("Get ENV data...\n");
+		http_get_env_data();
+		Log_Debug("Transfer AC data...\n");
+		http_transfer_ac_data(uart_fd);
 	}
 }
 
@@ -221,11 +248,8 @@ int main(int argc, char* argv[])
 	// Initialize user-defined Peripheral and Handlers
 	InitPeripheralsAndHandlers();
 
-	// HTTPS Testing
-	http_get_env_data();
-
 	// Main loop
-	/*while (!lp_isTerminationRequired())
+	while (!lp_isTerminationRequired())
 	{
 		int result = EventLoop_Run(lp_timerGetEventLoop(), -1, true);
 		// Continue if interrupted by signal, e.g. due to breakpoint being set.
@@ -233,7 +257,7 @@ int main(int argc, char* argv[])
 		{
 			lp_terminate(ExitCode_Main_EventLoopFail);
 		}
-	}*/
+	}
 
 	// Close user-defined Peripheral and Handlers
 	ClosePeripheralsAndHandlers();
