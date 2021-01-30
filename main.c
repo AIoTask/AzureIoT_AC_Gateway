@@ -109,6 +109,7 @@ LP_TIMER* timerSet[] = { &azureIotConnectionStatusTimer, &measureSensorTimer };
 // Message templates and property sets
 
 static const char* msgTemplate = "{ \"Temperature\":%3.2f, \"Humidity\":%3.1f, \"Pressure\":%3.1f, \"CO2\":%d, \"Light\":%d, \"dB\":%d, \"MsgId\":%d }";
+static int uart_fd;
 
 static LP_MESSAGE_PROPERTY* telemetryMessageProperties[] = {
 	&(LP_MESSAGE_PROPERTY) { .key = "appid", .value = "hvac" },
@@ -163,7 +164,6 @@ static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer)
 	}
 }
 
-
 /// <summary>
 ///  Initialize peripherals, device twins, direct methods, timers.
 /// </summary>
@@ -180,6 +180,8 @@ static void InitPeripheralsAndHandlers(void)
 
 	// Start timer
 	lp_timerSetStart(timerSet, NELEMS(timerSet));
+
+    uart_fd = uart_open(57600);
 }
 
 /// <summary>
@@ -198,6 +200,8 @@ static void ClosePeripheralsAndHandlers(void)
 	lp_closeDevKit();
 
 	lp_timerEventLoopStop();
+
+	close(uart_fd);
 }
 
 
@@ -216,12 +220,8 @@ int main(int argc, char* argv[])
 	// Initialize user-defined Peripheral and Handlers
 	InitPeripheralsAndHandlers();
 
-	int res = uart_open(57600);
-	Log_Debug("%d\n", res);
-	if (res > 0) close(res);
-
 	// Main loop
-	/*while (!lp_isTerminationRequired())
+	while (!lp_isTerminationRequired())
 	{
 		int result = EventLoop_Run(lp_timerGetEventLoop(), -1, true);
 		// Continue if interrupted by signal, e.g. due to breakpoint being set.
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
 		{
 			lp_terminate(ExitCode_Main_EventLoopFail);
 		}
-	}*/
+	}
 
 	// Close user-defined Peripheral and Handlers
 	ClosePeripheralsAndHandlers();
