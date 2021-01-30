@@ -1,5 +1,5 @@
 #include "http_operation.h"
-#define TASK_URL "https://aiot-task-api.azurewebsites.net/api/GetENVData?env_id=1&time=2020/01/01_00:00:00"
+#include <errno.h>
 
 static int uart_fd;
 
@@ -42,13 +42,22 @@ size_t env_transfer(void* ptr, size_t size, size_t nmemb, struct string* s)
     res = write(uart_fd, eol, 2);
     Log_Debug(" -> EOL +%d\n", res);
 
-    return res + 2;
+    return (res + 2);
 }
 
-int http_get_env_data() {
+int http_get_env_data(int envno, int time_hr, int time_min) {
 	CURL* curl;
 	CURLcode res;
 
+    // char* urlfmt = ;
+
+    // char task_env_url = (char*)malloc(sizeof(char) * 100);
+    /*int stat = snprintf(task_env_url, , envno, time_hr, time_min);
+    Log_Debug("[%d] [%d]", stat, errno);
+    Log_Debug("URL: %s\n", task_env_url);*/
+
+    char* task_env_url = "https://aiot-task-api.azurewebsites.net/api/GetENVData?env_id=1&time=2020/01/01_00:00:00";
+    
     struct string s;
     init_string(&s);
 
@@ -57,7 +66,7 @@ int http_get_env_data() {
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 	curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, TASK_URL);
+        curl_easy_setopt(curl, CURLOPT_URL, task_env_url);
 
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
@@ -84,7 +93,7 @@ int http_get_env_data() {
     return return_code;
 }
 
-int http_transfer_ac_data(int uart_fdno) {
+int http_transfer_ac_data(int uart_fdno, int acno, int time_hr, int time_min) {
 
     CURL* curl;
     CURLcode res;

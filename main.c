@@ -56,7 +56,6 @@
 #include <time.h>
 
 // User-defined Library
-#include "clean_room_sim.h"
 #include "uart_conn.h"
 #include "http_operation.h"
 
@@ -77,118 +76,49 @@
 #define IOT_PLUG_AND_PLAY_MODEL_ID "dtmi:com:example:azuresphere:labmonitor;1"	// https://docs.microsoft.com/en-us/azure/iot-pnp/overview-iot-plug-and-play
 //#define IOT_PLUG_AND_PLAY_MODEL_ID ""
 // Forward signatures
-static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer);
-static void AzureIoTConnectionStatusHandler(EventLoopTimer* eventLoopTimer);
 static void get_simulation_data(EventLoopTimer* eventLoopTimer);
 
 LP_USER_CONFIG lp_config;
 
-static char msgBuffer[JSON_MESSAGE_BYTES] = { 0 };
 
 // GPIO Input Peripherals
-static LP_GPIO azureIotConnectedLed = {
-	.pin = NETWORK_CONNECTED_LED,
+static LP_GPIO UARTfileLed = {
+	.pin = LED1,
 	.direction = LP_OUTPUT,
 	.initialState = GPIO_Value_Low,
 	.invertPin = true,
-	.name = "azureIotConnectedLed" };
+	.name = "UARTfileLed" };
 
 // Timers
-static LP_TIMER azureIotConnectionStatusTimer = {
-	.period = { 5, 0 },
-	.name = "azureIotConnectionStatusTimer",
-	.handler = AzureIoTConnectionStatusHandler };
-
-static LP_TIMER measureSensorTimer = {
-	.period = { 6, 0 },
-	.name = "measureSensorTimer",
-	.handler = MeasureSensorHandler };
-
 static LP_TIMER getSimulationData = {
-	.period = { 4, 0 },
+	.period = { 5, 0 },
 	.name = "getSimulationData",
 	.handler = get_simulation_data };
 
 
 // Initialize Sets
-LP_GPIO* peripheralGpioSet[] = { &azureIotConnectedLed };
-LP_TIMER* timerSet[] = { &measureSensorTimer, &getSimulationData };
+LP_GPIO* peripheralGpioSet[] = { &UARTfileLed };
+LP_TIMER* timerSet[] = { &getSimulationData };
 
 // Message templates and property sets
-
-static const char* msgTemplate = "{ \"Temperature\":%3.2f, \"Humidity\":%3.1f, \"Pressure\":%3.1f, \"CO2\":%d, \"Light\":%d, \"dB\":%d, \"MsgId\":%d }";
 static int uart_fd;
 
-static LP_MESSAGE_PROPERTY* telemetryMessageProperties[] = {
-	&(LP_MESSAGE_PROPERTY) { .key = "appid", .value = "hvac" },
-	&(LP_MESSAGE_PROPERTY) {.key = "format", .value = "json" },
-	&(LP_MESSAGE_PROPERTY) {.key = "type", .value = "telemetry" },
-	&(LP_MESSAGE_PROPERTY) {.key = "version", .value = "1" }
-};
-
-
 /// <summary>
-/// Check status of connection to Azure IoT
-/// </summary>
-static void AzureIoTConnectionStatusHandler(EventLoopTimer* eventLoopTimer)
-{
-	static bool toggleConnectionStatusLed = true;
-
-	if (ConsumeEventLoopTimerEvent(eventLoopTimer) != 0) {
-		lp_terminate(ExitCode_ConsumeEventLoopTimeEvent);
-	}
-	else {
-		if (lp_azureConnect()) {
-			lp_gpioStateSet(&azureIotConnectedLed, toggleConnectionStatusLed);
-			toggleConnectionStatusLed = !toggleConnectionStatusLed;
-		}
-		else {
-			lp_gpioStateSet(&azureIotConnectedLed, false);
-		}
-	}
-}
-
-/// <summary>
-/// Read sensor and send to Azure IoT
-/// </summary>
-static void MeasureSensorHandler(EventLoopTimer* eventLoopTimer)
-{
-	static int msgId = 0;
-	static LP_ENVIRONMENT environment;
-
-	if (ConsumeEventLoopTimerEvent(eventLoopTimer) != 0)
-	{
-		lp_terminate(ExitCode_ConsumeEventLoopTimeEvent);
-	}
-	else {
-		/*if (lp_readTelemetry(&environment) &&
-			snprintf(msgBuffer, JSON_MESSAGE_BYTES, msgTemplate,
-				environment.temperature, environment.humidity, environment.pressure, environment.CO2, environment.light, environment.dB, msgId++) > 0)
-		{
-			Log_Debug("%s\n", msgBuffer);
-			lp_azureMsgSendWithProperties(msgBuffer, telemetryMessageProperties, NELEMS(telemetryMessageProperties));
-		}*/
-		
-	}
-}
-
-/// <summary>
-/// Read sensor and send to Azure IoT
+/// get_simulation_data 
 /// </summary>
 static void get_simulation_data(EventLoopTimer* eventLoopTimer)
 {
-	static int msgId = 0;
-	static LP_ENVIRONMENT environment;
 
 	if (ConsumeEventLoopTimerEvent(eventLoopTimer) != 0)
 	{
+		lp_gpioStateSet(&UARTfileLed, false);
 		lp_terminate(ExitCode_ConsumeEventLoopTimeEvent);
 	}
 	else {
-		Log_Debug("Get ENV data...\n");
-		http_get_env_data();
-		Log_Debug("Transfer AC data...\n");
-		http_transfer_ac_data(uart_fd);
+		// Log_Debug("Get ENV data...\n");
+		http_get_env_data(1, 0, 0);
+		// Log_Debug("Transfer AC data...\n");
+		http_transfer_ac_data(uart_fd, 1, 0, 0);
 	}
 }
 
@@ -210,6 +140,10 @@ static void InitPeripheralsAndHandlers(void)
 	lp_timerSetStart(timerSet, NELEMS(timerSet));
 
     uart_fd = uart_open(57600);
+
+	if (uart_fd > 0) {
+		lp_gpioStateSet(&UARTfileLed, true);
+	}
 }
 
 /// <summary>
@@ -218,6 +152,8 @@ static void InitPeripheralsAndHandlers(void)
 static void ClosePeripheralsAndHandlers(void)
 {
 	Log_Debug("Closing file descriptors\n");
+
+	
 
 	// Stop timers and Azure IoT Service
 	lp_timerSetStop(timerSet, NELEMS(timerSet));

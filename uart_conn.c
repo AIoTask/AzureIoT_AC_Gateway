@@ -2,7 +2,7 @@
 
 // While return value is positive, it means the file descriptor of UART
 // Otherwise, it means the error number of opening UART
-int uart_open(int baudrate) {
+int uart_open(unsigned int baudrate) {
 	// UART Testing
 	UART_Config uart_conf;
 	UART_InitConfig(&uart_conf);

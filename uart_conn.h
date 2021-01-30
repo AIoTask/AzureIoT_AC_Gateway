@@ -10,6 +10,6 @@
 // Hardware definition
 #include "hw/azure_sphere_learning_path.h"
 
-int uart_open(int);
+int uart_open(unsigned int);
 
 #endif

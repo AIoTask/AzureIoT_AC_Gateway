@@ -12,8 +12,8 @@
 #include <tlsutils/deviceauth_curl.h> // required only for mutual authentication
 #include <curl/curl.h>
 
-int http_get_env_data();
+int http_get_env_data(int, int, int);
 
-int http_transfer_ac_data(int);
+int http_transfer_ac_data(int, int, int, int);
 
 #endif
